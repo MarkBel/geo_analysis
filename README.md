@@ -4,7 +4,7 @@ The current application functionality includes:
 * Routes info
 * EDA
 * Optimal route calculator
-* ALternative data EDA
+* Alternative data EDA
 
 
 ## Current libraries versions list
@@ -18,11 +18,28 @@ Use [pip]() to install.
 - streamlit
 
 
-##Local development
+## Local development
 Port variable is defined in the .env file
 
 ```bash
 streamlit run --server.port $PORT app.py
 ```
+
+
+## Code quality before commit
+
+
+```bash
+pylint path_to_file
+```
+
+```bash
+black path_to_file
+```
+
+```bash
+black .
+```
+
 
 

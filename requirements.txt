@@ -1,3 +1,8 @@
 streamlit==1.21.0
 streamlit-folium==0.18.0
+loguru
+
+
+pylint
+black
 
