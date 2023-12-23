@@ -69,7 +69,7 @@ def create_maps(data):
 
   coordinates_list = transform_into_coordinates(popular_patterns, ROUTER_GEOM)
   for i, route in enumerate(coordinates_list):
-    map_object = folium.Map(location=substitute_list[0][0], zoom_start=15)
+    map_object = folium.Map(location=coordinates_list[0][0], zoom_start=15)
     for point in route:
       folium.Marker(location = point, popup = point, icon=folium.Icon('blue')).add_to(map_object)
     map_object.save('map_with_points_afternoon_' + str(i) + '.html')
