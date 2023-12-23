@@ -1,3 +1,4 @@
+import pandas as pd
 def prepare_data(path):
   wifi_logs = pd.read_csv(path, sep = ';')
   wifi_logs['tm'] = pd.to_datetime(wifi_logs['tm'])
