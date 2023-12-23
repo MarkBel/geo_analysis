@@ -1,4 +1,36 @@
 import pandas as pd
+from difflib import SequenceMatcher
+
+def find_common_pattern(lists):
+    patterns = set()
+
+    for i in range(len(lists)):
+        for j in range(i + 1, len(lists)):
+            matcher = SequenceMatcher(None, lists[i], lists[j])
+            match = matcher.find_longest_match(0, len(lists[i]), 0, len(lists[j]))
+
+            if match.size > 3:  # Minimum length of the common pattern
+                common_pattern = lists[i][match.a: match.a + match.size]
+                patterns.add(tuple(common_pattern))
+
+    return patterns
+
+def calculate_similarity(list1, list2):
+    matcher = SequenceMatcher(None, list1, list2)
+    similarity_percentage = matcher.ratio()
+    return similarity_percentage
+
+
+def find_pattern(value, patterns):
+  similarity = 0
+  best_pattern = 0
+  for pattern in patterns:
+    if calculate_similarity(value, pattern) > similarity:
+      similarity = calculate_similarity(value, pattern)
+      best_pattern = pattern
+  return best_pattern
+
+
 def prepare_data(path):
   wifi_logs = pd.read_csv(path, sep = ';')
   wifi_logs['tm'] = pd.to_datetime(wifi_logs['tm'])
