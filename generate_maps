@@ -1,0 +1,44 @@
+def prepare_data(path):
+  wifi_logs = pd.read_csv(path, sep = ';')
+  wifi_logs['tm'] = pd.to_datetime(wifi_logs['tm'])
+  wifi_logs['1_min'] = wifi_logs['tm'].dt.floor('1T').dt.strftime('%H:%M')
+  morning = wifi_logs[(pd.to_datetime(wifi_logs['1_min']) < pd.to_datetime('9:00')) & (pd.to_datetime('7:00') < pd.to_datetime(wifi_logs['1_min']))]
+  afternoon = wifi_logs[(pd.to_datetime(wifi_logs['1_min']) < pd.to_datetime('15:00')) & (pd.to_datetime('12:00') < pd.to_datetime(wifi_logs['1_min']))]
+  evening = wifi_logs[(pd.to_datetime(wifi_logs['1_min']) < pd.to_datetime('20:00')) & (pd.to_datetime('17:00') < pd.to_datetime(wifi_logs['1_min']))]
+
+  return morning, afternoon, evening
+
+def create_maps(data):
+
+  filtered_users = data.groupby('user_mac')['router_id'].nunique() > 5
+  selected_users = filtered_users[filtered_users].index.tolist()
+  data = data[data['user_mac'].isin(selected_users)]
+
+  data = data.loc[data.groupby(['user_mac', '1_min'])['signal'].idxmax()][['1_min', 'router_id', 'signal', 'user_mac']]
+
+  routes = pd.DataFrame(data.groupby('user_mac')['router_id'].unique())
+  routes = routes.reset_index()
+
+  lists = [i.tolist() for i in routes['router_id']]
+
+  common_patterns = find_common_pattern(lists)
+  common_patterns = [list(i) for i in common_patterns]
+
+  found_patterns = []
+  for i in routes['router_id']:
+    found_patterns.append(find_pattern(i, common_patterns))
+
+  routes['patterns'] = pd.Series(found_patterns)
+
+  pattern_counts = routes['patterns'].value_counts()
+  popular_patterns = pattern_counts[pattern_counts >= 3].index.tolist()
+  popular_patterns = [list(i) for i in popular_patterns]
+
+  coordinates_list = transform_into_coordinates(popular_patterns, ROUTER_GEOM)
+  for i, route in enumerate(coordinates_list):
+    map_object = folium.Map(location=substitute_list[0][0], zoom_start=15)
+    for point in route:
+      folium.Marker(location = point, popup = point, icon=folium.Icon('blue')).add_to(map_object)
+    map_object.save('map_with_points_afternoon_' + str(i) + '.html')
+
+
