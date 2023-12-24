@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
-import folium
 from streamlit_folium import st_folium
 from loguru import logger
 
-# from generate_maps import prepare_data,create_maps
 import os
 
 from popular_routes import prepare_data, create_map_day, create_map_week
