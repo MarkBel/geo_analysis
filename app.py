@@ -14,17 +14,7 @@ from route_calculator import calculate_mean_time
 
 @st.cache_data
 def read_catched_data():
-    logger.info("Reading wifi_logs data..")
-    # Можно скачать папку с яндекса
-    folder_path = "wifi_logs_2022_12_1"
-
-    wifi_logs = pd.DataFrame(
-        columns=["guid", "tm", "router_mac", "user_mac", "signal", "router_id"]
-    )
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        wifi_log = pd.read_csv(file_path, sep=";")
-        wifi_logs = pd.concat([wifi_logs, wifi_log], axis=0)
+    wifi_logs = pd.read_csv("data/wifi_logs_2022_12_01_202312081829.csv", sep=";")
     return wifi_logs
 
 
