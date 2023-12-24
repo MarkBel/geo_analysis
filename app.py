@@ -36,19 +36,19 @@ def main():
     html_day_capacity = open("reports/map_with_points_day_legend_powered.html")
     components.html(html_day_capacity.read())
 
-    data_for_routes_df = read_catched_data()
-    morning, afternoon, evening = prepare_data(data_for_routes_df)
+    morning, afternoon, evening = prepare_data(data)
+    st.dataframe(morning)
 
     with st.expander("Show average routes calculators"):
         morning_df = calculate_mean_time(morning)
         afternoon_df = calculate_mean_time(afternoon)
         evening_df = calculate_mean_time(evening)
         st.write("Average time for morning routes")
-        st.dataframe(calculate_mean_time(morning_df))
+        st.dataframe(morning_df)
         st.write("Average time for afternoon routes")
-        st.dataframe(calculate_mean_time(afternoon_df))
+        st.dataframe(afternoon_df)
         st.write("Average time for evening routes")
-        st.dataframe(calculate_mean_time(evening_df))
+        st.dataframe(evening_df)
 
     st_data_day = st_folium(map_day_object, width=1500)
 

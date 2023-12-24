@@ -1,5 +1,7 @@
 # Geo optimization
 
+Тетрадка с экспериментом:https://colab.research.google.com/drive/1xBZ7wEz6P4yhsSHjhWKzyOz9x2LsQG5W?usp=sharing
+
 Для запуска приложения, необходимо установить зависимости и запустить через Streamlit фреймворк:
 ```bash
  pip install -r requirements.txt
