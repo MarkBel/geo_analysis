@@ -14,11 +14,13 @@ from route_calculator import calculate_mean_time
 
 @st.cache_data
 def read_catched_data():
-    wifi_logs = pd.read_csv("data/wifi_logs_2022_12_01_202312081829.csv", sep=";")
+    wifi_logs = pd.read_parquet("data/wifi_logs_2022_12_01_202312081829.parquet.gzip")
     return wifi_logs
 
 
 def main():
+    df = pd.DataFrame(data={'col1': [1, 2], 'col2': [3, 4]})
+
     st.title("Wifi routers EDA by Gini team")
     data = read_catched_data()
     map_day_object = create_map_day(data)
