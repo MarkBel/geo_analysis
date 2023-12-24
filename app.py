@@ -4,59 +4,55 @@ import folium
 from streamlit_folium import st_folium
 from loguru import logger
 
-logger.debug("Loguru geo app logging init..")
+# from generate_maps import prepare_data,create_maps
+import os
+
+from popular_routes import prepare_data, create_map_day, create_map_week
+
+import streamlit.components.v1 as components
+
+from route_calculator import calculate_mean_time
+
+
+@st.cache_data
+def read_catched_data():
+    logger.info("Reading wifi_logs data..")
+    # Можно скачать папку с яндекса
+    folder_path = "wifi_logs_2022_12_1"
+
+    wifi_logs = pd.DataFrame(
+        columns=["guid", "tm", "router_mac", "user_mac", "signal", "router_id"]
+    )
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        wifi_log = pd.read_csv(file_path, sep=";")
+        wifi_logs = pd.concat([wifi_logs, wifi_log], axis=0)
+    return wifi_logs
 
 
 def main():
-    st.write("Loguru geo app")
-    wifi_routers = pd.read_csv("data/wifi_routers.csv", sep=";")
-    road_network = pd.read_csv("data/road_network.csv", sep=";")
-    road_network = road_network.dropna()
+    st.title("Wifi routers EDA by Gini team")
+    data = read_catched_data()
+    map_day_object = create_map_day(data)
+    st.write("Popular routes during the day")
+    html_day_capacity = open("reports/map_with_points_day_legend_powered.html")
+    components.html(html_day_capacity.read())
 
-    def extract_points(points):
-        lat = float(points.split()[1][1:])
-        lan = float(points.split()[2][:-1])
-        return lan, lat
+    data_for_routes_df = read_catched_data()
+    morning, afternoon, evening = prepare_data(data_for_routes_df)
 
-    def extract_roads(roads):
-        roads = roads.split(",")
-        c1 = extract_points(roads[0])
-        c2 = [float(i) for i in roads[1].split()]
-        c2 = tuple([c2[1], c2[0]])
-        c3 = roads[2].split()
-        c3_1 = c3[1][:-1]
-        c3 = tuple([float(c3_1), float(c3[0])])
-        return c1, c2, c3
+    with st.expander("Show average routes calculators"):
+        morning_df = calculate_mean_time(morning)
+        afternoon_df = calculate_mean_time(afternoon)
+        evening_df = calculate_mean_time(evening)
+        st.write("Average time for morning routes")
+        st.dataframe(calculate_mean_time(morning_df))
+        st.write("Average time for afternoon routes")
+        st.dataframe(calculate_mean_time(afternoon_df))
+        st.write("Average time for evening routes")
+        st.dataframe(calculate_mean_time(evening_df))
 
-    def satisfies_condition(tuple_value):
-        c1, c2 = tuple_value
-        return 54.1500 < c1 < 54.2700 and 37.5600 < c2 < 37.6800
-
-    routers = wifi_routers["geom"].apply(extract_points)
-    roads = road_network["geom"].apply(extract_roads)
-    roads = [
-        tuple_group
-        for tuple_group in roads
-        if all(satisfies_condition(inner_tuple) for inner_tuple in tuple_group)
-    ]
-
-    map_object = folium.Map(location=routers[1], zoom_start=50)
-
-    for point in routers:
-        folium.Marker(location=point, popup=point).add_to(map_object)
-
-    for road in roads:
-        folium.PolyLine(locations=road, color="blue").add_to(map_object)
-
-    # left, right = st.columns(2)
-    # st_data = st_folium(map_object, width=1500)
-
-    # with left:
-    #     st.write("Folium labeled map")
-    #
-    #
-    # with right:
-    #     st.write("Description")
+    st_data_day = st_folium(map_day_object, width=1500)
 
 
 if __name__ == "__main__":

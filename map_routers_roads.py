@@ -1,8 +1,8 @@
 import pandas as pd
 import folium
 
-wifi_routers = pd.read_csv("/wifi_routers.csv", sep=";")
-road_network = pd.read_csv("/road_network.csv", sep=";")
+wifi_routers = pd.read_csv("data/wifi_routers.csv", sep=";")
+road_network = pd.read_csv("data/road_network.csv", sep=";")
 road_network = road_network.dropna()
 
 
@@ -10,6 +10,12 @@ def extract_points(points):
     lat = float(points.split()[1][1:])
     lan = float(points.split()[2][:-1])
     return lan, lat
+
+
+wifi_routers["geom"] = wifi_routers["geom"].apply(extract_points)
+ROUTER_GEOM = {}
+for i in range(len(wifi_routers)):
+    ROUTER_GEOM[wifi_routers.iloc[i]["guid"]] = wifi_routers.iloc[i]["geom"]
 
 
 def extract_roads(roads):
@@ -28,7 +34,7 @@ def satisfies_condition(tuple_value):
     return 54.1500 < c1 < 54.2700 and 37.5600 < c2 < 37.6800
 
 
-routers = wifi_routers["geom"].apply(extract_points)
+routers = wifi_routers["geom"]
 roads = road_network["geom"].apply(extract_roads)
 roads = [
     tuple_group
