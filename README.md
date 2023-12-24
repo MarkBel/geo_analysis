@@ -1,10 +1,13 @@
 # Geo optimization
 
-The current application functionality includes:
-* Routes info
-* EDA
-* Optimal route calculator
-* Alternative data EDA
+Для запуска приложения, необходимо установить зависимости и запустить через Streamlit фреймворк:
+```bash
+ pip install -r requirements.txt
+```
+
+```bash
+ streamlit run app.py
+```
 
 
 ## Current libraries versions list
